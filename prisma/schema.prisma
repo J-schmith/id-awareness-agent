@@ -1,0 +1,152 @@
+// ─── Datasource & Generator ─────────────────────────────────────────────────
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// ─── NextAuth Models ────────────────────────────────────────────────────────
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  role          String    @default("admin")
+  accounts      Account[]
+  sessions      Session[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ─── Domain Models ──────────────────────────────────────────────────────────
+
+model Theme {
+  id            String         @id @default(cuid())
+  label         String         @unique
+  description   String?
+  color         String         @default("#0071e3")
+  active        Boolean        @default(true)
+  createdAt     DateTime       @default(now())
+  awarenessDays AwarenessDay[]
+}
+
+model AwarenessDay {
+  id            String         @id @default(cuid())
+  name          String
+  date          DateTime
+  themeId       String
+  theme         Theme          @relation(fields: [themeId], references: [id])
+  sourceUrl     String?
+  sourceNotes   String?
+  status        String         @default("discovered") // discovered | confirmed | skipped
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  messageDrafts MessageDraft[]
+
+  @@index([themeId])
+  @@index([date])
+  @@index([status])
+}
+
+model MessageDraft {
+  id              String          @id @default(cuid())
+  awarenessDayId  String
+  awarenessDay    AwarenessDay    @relation(fields: [awarenessDayId], references: [id], onDelete: Cascade)
+  subject         String
+  body            String          // HTML string
+  status          String          @default("pending") // pending | approved | rejected | sent
+  approvedBy      String?
+  approvedAt      DateTime?
+  rejectionReason String?
+  version         Int             @default(1)
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  scheduledSends  ScheduledSend[]
+
+  @@index([awarenessDayId])
+  @@index([status])
+}
+
+model Subscriber {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  segments  String   @default("[]") // JSON array
+  optedOut  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([optedOut])
+}
+
+model ScheduledSend {
+  id             String        @id @default(cuid())
+  draftId        String
+  draft          MessageDraft  @relation(fields: [draftId], references: [id], onDelete: Cascade)
+  sendDate       DateTime
+  segmentFilter  String?       // JSON
+  sentAt         DateTime?
+  recipientCount Int?
+  errorMessage   String?
+  createdAt      DateTime      @default(now())
+
+  @@index([draftId])
+  @@index([sendDate])
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  action     String
+  entityType String
+  entityId   String
+  actor      String
+  metadata   String?  // JSON
+  timestamp  DateTime @default(now())
+
+  @@index([entityType, entityId])
+  @@index([actor])
+  @@index([timestamp])
+}
