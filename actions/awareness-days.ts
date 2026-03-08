@@ -124,6 +124,37 @@ export async function updateDay(id: string, formData: FormData) {
   }
 }
 
+export async function bulkUpdateStatus(ids: string[], status: string) {
+  try {
+    if (!["discovered", "confirmed", "skipped"].includes(status)) {
+      return { success: false, error: "Invalid status" }
+    }
+
+    if (ids.length === 0) {
+      return { success: false, error: "No days selected" }
+    }
+
+    await prisma.awarenessDay.updateMany({
+      where: { id: { in: ids } },
+      data: { status },
+    })
+
+    await logAction({
+      action: `awareness_day.bulk_${status}`,
+      entityType: "AwarenessDay",
+      entityId: ids.join(","),
+      actor: ACTOR,
+      metadata: { count: ids.length, status },
+    })
+
+    revalidatePath("/awareness-days")
+    revalidatePath("/dashboard")
+    return { success: true }
+  } catch (err) {
+    return { success: false, error: err instanceof Error ? err.message : "Failed to update days" }
+  }
+}
+
 export async function deleteDay(id: string) {
   try {
     // MessageDrafts cascade-delete via the schema's onDelete: Cascade

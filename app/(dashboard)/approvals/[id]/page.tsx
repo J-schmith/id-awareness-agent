@@ -3,17 +3,16 @@ import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
 import { formatDate } from '@/lib/utils'
 import { StatusPill } from '@/components/ui/status-pill'
-import { Button } from '@/components/ui/button'
 import {
   ArrowLeft,
   Calendar,
   Tag,
   Users,
-  FileText,
   ExternalLink,
   Clock,
   Hash,
 } from 'lucide-react'
+import { DraftActions } from '@/components/approvals/draft-actions'
 
 export default async function DraftDetailPage({
   params,
@@ -177,35 +176,12 @@ export default async function DraftDetailPage({
           )}
 
           {/* Action Buttons */}
-          <div className="bg-white/80 backdrop-blur-xl border border-black/[0.07] rounded-2xl shadow-sm p-5 space-y-3">
-            <h3 className="text-[13px] font-semibold text-gray-900 uppercase tracking-wider">
-              Actions
-            </h3>
-
-            <div className="space-y-2">
-              <Button className="w-full" variant="primary" size="md">
-                Approve &amp; Schedule
-              </Button>
-
-              <Button className="w-full" variant="secondary" size="md">
-                <FileText className="w-4 h-4" />
-                Edit Draft
-              </Button>
-
-              <div className="pt-2 border-t border-black/[0.07]">
-                <label className="block text-[12px] text-gray-500 mb-1.5">
-                  Rejection reason
-                </label>
-                <textarea
-                  placeholder="Provide a reason for rejecting this draft..."
-                  className="w-full h-20 px-3 py-2 text-[13px] text-gray-700 bg-gray-50 border border-black/[0.07] rounded-lg resize-none placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#0071e3]/20 focus:border-[#0071e3]/30"
-                />
-                <Button className="w-full mt-2" variant="danger" size="md">
-                  Reject Draft
-                </Button>
-              </div>
-            </div>
-          </div>
+          <DraftActions
+            draftId={draft.id}
+            draftSubject={draft.subject}
+            draftBody={draft.body}
+            status={draft.status}
+          />
         </div>
       </div>
     </div>

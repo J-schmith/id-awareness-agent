@@ -1,9 +1,9 @@
 import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
 import { formatDate } from '@/lib/utils'
-import { StatusPill } from '@/components/ui/status-pill'
 import { Button } from '@/components/ui/button'
-import { Calendar, Plus, ExternalLink } from 'lucide-react'
+import { Plus } from 'lucide-react'
+import { AwarenessDaysTable } from '@/components/awareness-days/awareness-days-table'
 
 export default async function AwarenessDaysPage({
   searchParams,
@@ -25,15 +25,37 @@ export default async function AwarenessDaysPage({
 
   const statuses = ['discovered', 'confirmed', 'skipped']
 
+  // Count confirmed days without drafts
+  const confirmedWithoutDrafts = days.filter(
+    (d) => d.status === 'confirmed' && d.messageDrafts.length === 0
+  ).length
+
+  // Serialize for client component
+  const dayRows = days.map((day) => ({
+    id: day.id,
+    date: formatDate(day.date),
+    name: day.name,
+    status: day.status,
+    sourceUrl: day.sourceUrl,
+    theme: { label: day.theme.label, color: day.theme.color },
+    draftId: day.messageDrafts.length > 0 ? day.messageDrafts[0].id : null,
+    draftCount: day.messageDrafts.length,
+  }))
+
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-xl font-semibold text-gray-900">Awareness Days</h2>
-          <p className="text-sm text-gray-500 mt-0.5">
-            Manage upcoming inclusion and diversity awareness days
-          </p>
+        <div className="flex items-center gap-3">
+          <div>
+            <h2 className="text-xl font-semibold text-gray-900">Awareness Days</h2>
+            <p className="text-sm text-gray-500 mt-0.5">
+              Manage upcoming inclusion and diversity awareness days
+            </p>
+          </div>
+          <span className="inline-flex items-center gap-1.5 h-8 px-3 rounded-xl bg-gray-900 text-[14px] font-semibold text-white tabular-nums">
+            {days.length} <span className="text-[12px] font-medium text-gray-300">result{days.length !== 1 ? 's' : ''}</span>
+          </span>
         </div>
         <Button variant="primary" size="md">
           <Plus className="w-4 h-4" />
@@ -105,99 +127,8 @@ export default async function AwarenessDaysPage({
         </div>
       </div>
 
-      {/* Table */}
-      <div className="bg-white/80 backdrop-blur-xl border border-black/[0.07] rounded-2xl shadow-sm overflow-hidden">
-        {days.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-16 text-gray-400">
-            <Calendar className="w-10 h-10 mb-3 text-gray-300" />
-            <p className="text-sm font-medium">No awareness days found</p>
-            <p className="text-xs mt-1">Try adjusting your filters or add a new day</p>
-          </div>
-        ) : (
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-black/[0.07]">
-                <th className="text-left px-5 py-3 text-[11px] font-semibold text-gray-400 uppercase tracking-wider">
-                  Date
-                </th>
-                <th className="text-left px-5 py-3 text-[11px] font-semibold text-gray-400 uppercase tracking-wider">
-                  Name
-                </th>
-                <th className="text-left px-5 py-3 text-[11px] font-semibold text-gray-400 uppercase tracking-wider">
-                  Theme
-                </th>
-                <th className="text-left px-5 py-3 text-[11px] font-semibold text-gray-400 uppercase tracking-wider">
-                  Status
-                </th>
-                <th className="text-left px-5 py-3 text-[11px] font-semibold text-gray-400 uppercase tracking-wider">
-                  Drafts
-                </th>
-                <th className="text-right px-5 py-3 text-[11px] font-semibold text-gray-400 uppercase tracking-wider">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {days.map((day) => (
-                <tr
-                  key={day.id}
-                  className="border-b border-black/[0.07] last:border-0 hover:bg-black/[0.02] transition-colors"
-                >
-                  <td className="px-5 py-3.5">
-                    <span className="text-[13px] font-medium text-gray-900 tabular-nums">
-                      {formatDate(day.date)}
-                    </span>
-                  </td>
-                  <td className="px-5 py-3.5">
-                    <span className="text-[13px] font-medium text-gray-900">
-                      {day.name}
-                    </span>
-                  </td>
-                  <td className="px-5 py-3.5">
-                    <span
-                      className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-semibold text-white"
-                      style={{ backgroundColor: day.theme.color }}
-                    >
-                      {day.theme.label}
-                    </span>
-                  </td>
-                  <td className="px-5 py-3.5">
-                    <StatusPill status={day.status} />
-                  </td>
-                  <td className="px-5 py-3.5">
-                    <span className="text-[13px] text-gray-500">
-                      {day.messageDrafts.length}
-                    </span>
-                  </td>
-                  <td className="px-5 py-3.5 text-right">
-                    <div className="flex items-center justify-end gap-2">
-                      {day.sourceUrl && (
-                        <a
-                          href={day.sourceUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
-                          title="View source"
-                        >
-                          <ExternalLink className="w-3.5 h-3.5" />
-                        </a>
-                      )}
-                      {day.messageDrafts.length > 0 && (
-                        <Link
-                          href={`/approvals/${day.messageDrafts[0].id}`}
-                          className="text-[12px] font-medium text-[#0071e3] hover:underline"
-                        >
-                          View Draft
-                        </Link>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </div>
+      {/* Table with bulk selection */}
+      <AwarenessDaysTable days={dayRows} confirmedWithoutDrafts={confirmedWithoutDrafts} />
     </div>
   )
 }

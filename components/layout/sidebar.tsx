@@ -11,8 +11,16 @@ import {
   Activity,
   Settings,
 } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 
-const navSections = [
+interface NavItem {
+  name: string;
+  href: string;
+  icon: LucideIcon;
+  badgeKey?: string;
+}
+
+const navSections: { label: string; items: NavItem[] }[] = [
   {
     label: "Overview",
     items: [
@@ -22,8 +30,8 @@ const navSections = [
   {
     label: "Agent",
     items: [
-      { name: "Approvals", href: "/approvals", icon: ClipboardCheck, badge: 3 },
-      { name: "Awareness Days", href: "/awareness-days", icon: Calendar },
+      { name: "Approvals", href: "/approvals", icon: ClipboardCheck, badgeKey: "approvals" },
+      { name: "Awareness Days", href: "/awareness-days", icon: Calendar, badgeKey: "awarenessDays" },
       { name: "Themes", href: "/themes", icon: Tag },
     ],
   },
@@ -37,7 +45,16 @@ const navSections = [
   },
 ];
 
-export default function Sidebar() {
+const badgeColors: Record<string, string> = {
+  approvals: "bg-[#ff9500]",
+  awarenessDays: "bg-[#af52de]",
+};
+
+interface SidebarProps {
+  badges?: Record<string, number>;
+}
+
+export default function Sidebar({ badges = {} }: SidebarProps) {
   const pathname = usePathname();
 
   return (
@@ -72,6 +89,7 @@ export default function Sidebar() {
               {section.items.map((item) => {
                 const isActive = pathname === item.href;
                 const Icon = item.icon;
+                const badgeCount = item.badgeKey ? badges[item.badgeKey] : undefined;
 
                 return (
                   <li key={item.href}>
@@ -90,9 +108,9 @@ export default function Sidebar() {
                         strokeWidth={1.8}
                       />
                       <span className="flex-1">{item.name}</span>
-                      {item.badge !== undefined && (
-                        <span className="min-w-[20px] h-5 flex items-center justify-center rounded-full bg-[#ff9500] text-white text-[11px] font-semibold px-1.5">
-                          {item.badge}
+                      {badgeCount !== undefined && badgeCount > 0 && (
+                        <span className={`min-w-[20px] h-5 flex items-center justify-center rounded-full text-white text-[11px] font-semibold px-1.5 ${badgeColors[item.badgeKey!] || "bg-gray-400"}`}>
+                          {badgeCount}
                         </span>
                       )}
                     </Link>
