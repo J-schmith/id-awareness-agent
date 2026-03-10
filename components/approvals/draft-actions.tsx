@@ -12,10 +12,13 @@ interface DraftActionsProps {
   draftId: string
   draftSubject: string
   draftBody: string
+  draftImageUrl?: string | null
+  draftImageAlt?: string | null
+  draftImageCredit?: string | null
   status: string
 }
 
-export function DraftActions({ draftId, draftSubject, draftBody, status }: DraftActionsProps) {
+export function DraftActions({ draftId, draftSubject, draftBody, draftImageUrl, draftImageAlt, draftImageCredit, status }: DraftActionsProps) {
   const router = useRouter()
   const [approving, setApproving] = useState(false)
   const [editOpen, setEditOpen] = useState(false)
@@ -23,6 +26,9 @@ export function DraftActions({ draftId, draftSubject, draftBody, status }: Draft
   const [rejecting, setRejecting] = useState(false)
   const [subject, setSubject] = useState(draftSubject)
   const [body, setBody] = useState(draftBody)
+  const [imageUrl, setImageUrl] = useState(draftImageUrl ?? '')
+  const [imageAlt, setImageAlt] = useState(draftImageAlt ?? '')
+  const [imageCredit, setImageCredit] = useState(draftImageCredit ?? '')
   const [rejectReason, setRejectReason] = useState('')
 
   const isPending = status === 'pending'
@@ -45,6 +51,9 @@ export function DraftActions({ draftId, draftSubject, draftBody, status }: Draft
     const formData = new FormData()
     formData.set('subject', subject)
     formData.set('body', body)
+    formData.set('imageUrl', imageUrl)
+    formData.set('imageAlt', imageAlt)
+    formData.set('imageCredit', imageCredit)
     const result = await updateDraft(draftId, formData)
     if (result.success) {
       toast.success('Draft updated')
@@ -167,6 +176,49 @@ export function DraftActions({ draftId, draftSubject, draftBody, status }: Draft
               rows={12}
               className="w-full px-3 py-2 text-[13px] text-gray-700 bg-gray-50 border border-black/[0.07] rounded-lg font-mono resize-y placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#0071e3]/20 focus:border-[#0071e3]/30"
             />
+          </div>
+
+          {/* Hero Image Fields */}
+          <div className="pt-3 border-t border-black/[0.07]">
+            <p className="text-[12px] font-medium text-gray-500 mb-3">Hero Image</p>
+            {imageUrl && (
+              <div className="mb-3 rounded-lg overflow-hidden">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={imageUrl} alt={imageAlt} className="w-full max-h-[150px] object-cover" />
+              </div>
+            )}
+            <div className="space-y-2">
+              <div>
+                <label className="block text-[11px] text-gray-400 mb-1">Image URL</label>
+                <input
+                  type="text"
+                  value={imageUrl}
+                  onChange={(e) => setImageUrl(e.target.value)}
+                  placeholder="https://images.unsplash.com/..."
+                  className="w-full h-8 px-3 text-[12px] text-gray-700 bg-gray-50 border border-black/[0.07] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0071e3]/20 focus:border-[#0071e3]/30"
+                />
+              </div>
+              <div>
+                <label className="block text-[11px] text-gray-400 mb-1">Alt text</label>
+                <input
+                  type="text"
+                  value={imageAlt}
+                  onChange={(e) => setImageAlt(e.target.value)}
+                  placeholder="Description of the image"
+                  className="w-full h-8 px-3 text-[12px] text-gray-700 bg-gray-50 border border-black/[0.07] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0071e3]/20 focus:border-[#0071e3]/30"
+                />
+              </div>
+              <div>
+                <label className="block text-[11px] text-gray-400 mb-1">Credit</label>
+                <input
+                  type="text"
+                  value={imageCredit}
+                  onChange={(e) => setImageCredit(e.target.value)}
+                  placeholder="Photo by Name on Unsplash"
+                  className="w-full h-8 px-3 text-[12px] text-gray-700 bg-gray-50 border border-black/[0.07] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0071e3]/20 focus:border-[#0071e3]/30"
+                />
+              </div>
+            </div>
           </div>
         </div>
       </Modal>

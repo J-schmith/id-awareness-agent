@@ -17,6 +17,7 @@ export const config = {
   NEXTAUTH_SECRET: requireEnv('NEXTAUTH_SECRET'),
 
   // Optional
+  UNSPLASH_ACCESS_KEY: optionalEnv('UNSPLASH_ACCESS_KEY'),
   AWS_ACCESS_KEY_ID: optionalEnv('AWS_ACCESS_KEY_ID'),
   AWS_SECRET_ACCESS_KEY: optionalEnv('AWS_SECRET_ACCESS_KEY'),
   AWS_REGION: optionalEnv('AWS_REGION', 'eu-west-1'),

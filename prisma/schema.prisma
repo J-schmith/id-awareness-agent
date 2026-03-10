@@ -97,6 +97,9 @@ model MessageDraft {
   awarenessDay    AwarenessDay    @relation(fields: [awarenessDayId], references: [id], onDelete: Cascade)
   subject         String
   body            String          // HTML string
+  imageUrl        String?         // Unsplash photo URL for email hero image
+  imageAlt        String?         // Alt text for accessibility
+  imageCredit     String?         // Photographer attribution (Unsplash TOS)
   status          String          @default("pending") // pending | approved | rejected | sent
   approvedBy      String?
   approvedAt      DateTime?

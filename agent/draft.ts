@@ -1,6 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { config } from "@/lib/config";
 import { draftSystemPrompt, draftUserPrompt, refinementPrompt } from "./prompts";
+import { fetchAwarenessDayImage } from "./image";
 import type { DraftResult } from "./types";
 
 /**
@@ -76,10 +77,28 @@ export async function generateDraft(awarenessDay: {
     }
   }
 
+  // Extract image keywords suggested by Claude
+  const imageKeywords = Array.isArray(parsed.imageKeywords)
+    ? (parsed.imageKeywords as unknown[]).filter((k): k is string => typeof k === "string")
+    : undefined;
+
+  // Fetch a hero image from Unsplash
+  const image = await fetchAwarenessDayImage({
+    dayName: awarenessDay.name,
+    themeLabel: awarenessDay.theme.label,
+    keywords: imageKeywords,
+  }).catch((err) => {
+    console.error("[agent/draft] Failed to fetch image:", err);
+    return null;
+  });
+
   return {
     subject: parsed.subject,
     body: parsed.body,
     sourcesCited: Array.from(new Set(sourcesCited)),
+    imageUrl: image?.imageUrl,
+    imageAlt: image?.imageAlt,
+    imageCredit: image?.imageCredit,
   };
 }
 

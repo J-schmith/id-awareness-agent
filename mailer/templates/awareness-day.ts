@@ -8,8 +8,11 @@ export function buildEmailHtml(params: {
   body: string;
   subscriberName: string;
   unsubscribeUrl: string;
+  imageUrl?: string | null;
+  imageAlt?: string | null;
+  imageCredit?: string | null;
 }): string {
-  const { subject, body, subscriberName, unsubscribeUrl } = params;
+  const { subject, body, subscriberName, unsubscribeUrl, imageUrl, imageAlt, imageCredit } = params;
 
   const greeting = subscriberName
     ? `Hi ${subscriberName},`
@@ -57,6 +60,23 @@ export function buildEmailHtml(params: {
               </table>
             </td>
           </tr>
+
+          ${imageUrl ? `<!-- Hero image -->
+          <tr>
+            <td style="padding:0;font-size:0;line-height:0;">
+              <img
+                src="${escapeHtml(imageUrl)}"
+                alt="${escapeHtml(imageAlt ?? '')}"
+                width="600"
+                style="display:block;width:100%;height:auto;max-height:250px;object-fit:cover;"
+              />
+            </td>
+          </tr>
+          ${imageCredit ? `<tr>
+            <td style="padding:4px 40px 0;text-align:right;">
+              <p style="margin:0;font-size:10px;color:#86868b;">${escapeHtml(imageCredit)}</p>
+            </td>
+          </tr>` : ''}` : ''}
 
           <!-- Body content -->
           <tr>

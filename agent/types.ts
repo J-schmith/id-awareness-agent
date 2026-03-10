@@ -11,6 +11,9 @@ export interface DraftResult {
   subject: string;
   body: string;
   sourcesCited: string[];
+  imageUrl?: string;
+  imageAlt?: string;
+  imageCredit?: string;
 }
 
 export interface AgentRunResult {

@@ -65,6 +65,23 @@ export default async function DraftDetailPage({
               </p>
             </div>
 
+            {/* Hero image */}
+            {draft.imageUrl && (
+              <div className="relative">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={draft.imageUrl}
+                  alt={draft.imageAlt ?? ''}
+                  className="w-full max-h-[250px] object-cover"
+                />
+                {draft.imageCredit && (
+                  <p className="absolute bottom-2 right-3 text-[10px] text-white/80 bg-black/30 px-2 py-0.5 rounded">
+                    {draft.imageCredit}
+                  </p>
+                )}
+              </div>
+            )}
+
             {/* Email body */}
             <div className="px-6 py-6">
               <div
@@ -180,6 +197,9 @@ export default async function DraftDetailPage({
             draftId={draft.id}
             draftSubject={draft.subject}
             draftBody={draft.body}
+            draftImageUrl={draft.imageUrl}
+            draftImageAlt={draft.imageAlt}
+            draftImageCredit={draft.imageCredit}
             status={draft.status}
           />
         </div>

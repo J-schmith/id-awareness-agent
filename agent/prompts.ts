@@ -72,11 +72,14 @@ Rules:
 4. Use simple, semantic HTML for the body (h2, p, ul/ol, strong, em). Do NOT use inline styles.
 5. Reference the official source of the day when relevant.
 
-Return your response as a JSON object with exactly two keys:
+Return your response as a JSON object with exactly three keys:
 {
   "subject": "<string — email subject line, max 80 chars>",
-  "body": "<string — the HTML body>"
+  "body": "<string — the HTML body>",
+  "imageKeywords": ["<string>", "<string>", "<string>"]
 }
+
+The "imageKeywords" array should contain 2-3 search terms that would find a relevant, professional stock photo for this awareness day (e.g. ["mental health", "wellness", "mindfulness"] for World Mental Health Day).
 
 Return ONLY the JSON object. Do not wrap it in markdown code fences.`;
 }

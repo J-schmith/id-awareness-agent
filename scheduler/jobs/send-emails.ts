@@ -86,6 +86,9 @@ export async function processPendingSends(): Promise<{
         body: scheduledSend.draft.body,
         subscriberName: '', // bulk send uses generic greeting
         unsubscribeUrl: `${APP_URL}/unsubscribe`,
+        imageUrl: scheduledSend.draft.imageUrl,
+        imageAlt: scheduledSend.draft.imageAlt,
+        imageCredit: scheduledSend.draft.imageCredit,
       });
 
       const result = await sendBulk({

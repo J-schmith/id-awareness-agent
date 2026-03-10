@@ -22,6 +22,9 @@ export const subscriberSchema = z.object({
 export const draftUpdateSchema = z.object({
   subject: z.string().min(1, 'Subject is required'),
   body: z.string().min(1, 'Body is required'),
+  imageUrl: z.string().url('Must be a valid URL').optional().or(z.literal('')),
+  imageAlt: z.string().optional().default(''),
+  imageCredit: z.string().optional().default(''),
 })
 
 export const csvImportSchema = z.object({

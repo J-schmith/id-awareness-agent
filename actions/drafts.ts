@@ -95,6 +95,9 @@ export async function updateDraft(draftId: string, formData: FormData) {
     const raw = {
       subject: formData.get("subject") as string,
       body: formData.get("body") as string,
+      imageUrl: (formData.get("imageUrl") as string) || '',
+      imageAlt: (formData.get("imageAlt") as string) || '',
+      imageCredit: (formData.get("imageCredit") as string) || '',
     }
 
     const parsed = draftUpdateSchema.safeParse(raw)
@@ -112,6 +115,9 @@ export async function updateDraft(draftId: string, formData: FormData) {
       data: {
         subject: parsed.data.subject,
         body: parsed.data.body,
+        imageUrl: parsed.data.imageUrl || null,
+        imageAlt: parsed.data.imageAlt || null,
+        imageCredit: parsed.data.imageCredit || null,
         version: existing.version + 1,
       },
     })

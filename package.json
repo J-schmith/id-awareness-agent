@@ -32,6 +32,7 @@
     "react-dom": "^18.3.1",
     "react-hot-toast": "^2.4.1",
     "tailwind-merge": "^2.6.0",
+    "unsplash-js": "^7.0.19",
     "zod": "^3.23.8"
   },
   "devDependencies": {
